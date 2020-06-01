@@ -22,7 +22,7 @@ class Query(graphene.ObjectType):
     def resolve_hello(self, info):
         return "World" 
 
-    def resolve_users(self, info, limit=None):
+    def resolve_users(self, info, limit=1):
         return [
             User(id="1",username="Fred",created_at=datetime.now()),
             User(id="2", username="Tom", created_at=datetime.now()),
@@ -45,8 +45,8 @@ class Mutation(graphene.ObjectType):
 schema = graphene.Schema(query=Query)
 result = schema.execute( #always in camel-case
     '''
-    mutation {
-        createUser (username: "Fred"){
+    mutation ($username: String) {
+        createUser (username: $username){
             user {
                 id
                 user
@@ -54,7 +54,8 @@ result = schema.execute( #always in camel-case
             }
         }
     }
-    '''
+    ''',
+    variable_values= {'username':'Sherlock'}
 )
 print(result)
 dictResult = dict(result.data.items())
